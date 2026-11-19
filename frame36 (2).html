@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="sv"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FRAME 36.</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+:root{--bg:#f3eee4;--or:#d8682e;--ink:#22211f;--mut:#5c574f;--card:#faf7f0;--line:#d9d2c2;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 'DM Sans',system-ui,sans-serif}
+main{max-width:430px;margin:0 auto;padding:16px 20px 96px;min-height:100vh}
+h1,h2,.sg{font-family:'Space Grotesk',system-ui,sans-serif;margin:0}
+h1{font-size:34px;line-height:1.1;font-weight:700}
+.mono{font:500 11px 'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
+.brand{font:700 15px 'Space Grotesk';letter-spacing:.04em}
+button,.btn{font:700 16px 'DM Sans';min-height:48px;border-radius:12px;border:2px solid var(--ink);background:none;color:var(--ink);padding:0 16px;width:100%;cursor:pointer}
+.pri{background:#b4521f;border-color:#b4521f;color:#fff}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.film{background:var(--ink);color:#fff;border-radius:14px;padding:14px;margin:20px 0}
+.bar{height:6px;background:#4a4640;border-radius:3px;overflow:hidden}.bar i{display:block;height:100%;background:var(--or)}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:16px 0}
+.cell{aspect-ratio:3/4;background:#e6dfd0;border:1px solid var(--line);border-radius:3px;display:grid;place-items:center;font:500 11px 'IBM Plex Mono'}
+.cell.on{background:var(--ink);color:#fff}
+.sheet{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--ink);padding:10px;border-radius:6px}
+.sheet button{padding:0;border:0;min-height:0;border-radius:2px;aspect-ratio:3/2;overflow:hidden}
+.sheet img,.hero{width:100%;height:100%;object-fit:cover;display:block}
+.hero{border-radius:8px;aspect-ratio:4/3;height:auto}
+.chips{display:flex;gap:8px;margin:12px 0}.chips button{min-height:44px;font-size:14px;border-radius:22px;padding:0 12px;width:auto}
+.chips [aria-pressed=true]{background:var(--ink);color:#fff}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0;text-align:left;min-height:64px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav div{max-width:430px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{border:0;min-height:56px;font:500 12px 'DM Sans';color:var(--mut);width:auto}
+nav [aria-current=page]{color:var(--or);color:#b4521f;font-weight:700}
+.dlg{position:fixed;inset:0;background:rgba(34,33,31,.92);display:grid;place-items:center;padding:24px;color:#fff;text-align:center}
+.dlg>div{max-width:340px}.dlg h2{font-size:26px;margin-bottom:8px}.dlg p{color:#ddd}.dlg button{margin-top:10px;color:#fff;border-color:#fff}
+.dlg .pri{border-color:#b4521f}
+.spin{animation:p 1.2s ease-in-out infinite;font-size:40px}@keyframes p{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.w{filter:sepia(.35) saturate(1.2) contrast(1.05)}.m{filter:grayscale(1) contrast(1.15)}.s{filter:contrast(.85) brightness(1.08) saturate(.8)}
+.sr{position:absolute;left:-9999px}
+</style></head><body><main id="app"></main>
+<input id="cam" class="sr" type="file" accept="image/*" capture="environment" aria-label="Ta ett foto" tabindex="-1">
+<script>
+const ST=['Warm 400','Mono 100','Soft Fade'],CL={'Warm 400':'w','Mono 100':'m','Soft Fade':'s'};
+let S;try{S=JSON.parse(localStorage.getItem('f36'))}catch(e){}
+S=S||{roll:{n:1,style:'Warm 400',shots:[]},arch:[]};
+let v='home',cur=null,pic=0;
+const save=()=>{try{localStorage.setItem('f36',JSON.stringify(S))}catch(e){alert('Lagringsutrymmet är fullt.')}};
+const pad=n=>String(n).padStart(3,'0'),A=document.getElementById('app');
+const left=()=>36-S.roll.shots.length;
+const tab={home:'home',roll:'home',confirm:'home',dev:'home',cam:'cam',arch:'arch',sheet:'arch',det:'arch',more:'more'}[v];
+function nav(){return `<nav aria-label="Huvudmeny"><div>${[['home','Hem'],['cam','Kamera'],['arch','Arkiv'],['more','Mer']].map(([k,l])=>`<button data-go="${k}" ${tab==k?'aria-current="page"':''}>${l}</button>`).join('')}</div></nav>`}
+function back(to,l){return `<button data-go="${to}" style="width:auto;border:0;min-height:44px;padding:0">← ${l}</button>`}
+function shutter(t){return `<button class="pri" data-shot ${left()?'':'disabled'}>${t}</button>`}
+function view(){
+ const r=S.roll;
+ if(v=='home')return `<div class="brand">FRAME 36.</div><div class="mono">Digital film journal</div>
+ <h1 style="margin-top:28px">Every frame tells a story.</h1><p>Slow down. Capture what matters.</p>
+ <div class="film"><span class="mono" style="color:#fff">Roll ${pad(r.n)} · ${r.style}</span><div class="sg" style="font-size:40px;margin:14px 0 8px">${r.shots.length}<span style="font-size:18px"> / 36</span></div><div class="bar" role="progressbar" aria-label="Exponeringar" aria-valuenow="${r.shots.length}" aria-valuemin="0" aria-valuemax="36"><i style="width:${r.shots.length/36*100}%"></i></div></div>
+ ${shutter('Ta ett foto')}<button data-go="roll" style="margin-top:10px">Visa pågående rulle</button>`;
+ if(v=='cam')return `<h2 style="font-size:28px">Kamera</h2><p class="mono">${left()} exponeringar kvar</p>
+ <div class="chips" role="group" aria-label="Filmstil">${ST.map(s=>`<button data-st="${s}" aria-pressed="${r.style==s}">${s}</button>`).join('')}</div>
+ <div class="film" style="text-align:center;padding:48px 14px"><div class="sg" style="font-size:44px">${left()}</div><div class="mono" style="color:#ddd">Bilderna visas först när rullen framkallas</div></div>${shutter('Fota')}`;
+ if(v=='roll')return `${back('home','Hem')}<span class="mono" style="display:block">Roll ${pad(r.n)}</span><h2 style="font-size:30px">Pågående rulle</h2>
+ <div class="grid" role="list">${Array.from({length:36},(_,i)=>`<div role="listitem" class="cell ${i<r.shots.length?'on':''}" aria-label="Bild ${i+1} ${i<r.shots.length?'tagen':'tom'}">${i+1}</div>`).join('')}</div>
+ ${shutter('Fortsätt foto')}<button class="pri" data-go="confirm" style="margin-top:10px" ${r.shots.length?'':'disabled'}>Framkalla rullen</button>`;
+ if(v=='confirm')return `<main></main><div class="dlg" role="dialog" aria-modal="true" aria-labelledby="t"><div><h2 id="t">Framkalla rullen?</h2><p>Rullen avslutas och kan inte fotograferas vidare. Dina bilder framkallas till ett kontaktark.</p><button class="pri" data-dev autofocus>Framkalla rullen</button><button data-go="roll">Avbryt</button></div></div>`;
+ if(v=='dev')return `<div class="dlg" role="status"><div><div class="spin" aria-hidden="true">▤</div><h2>Framkallar dina ögonblick ....</h2></div></div>`;
+ if(v=='arch')return `<h2 style="font-size:30px">Arkiv</h2><p>Dina ögonblick, om rullar i taget.</p>${S.arch.length?S.arch.map((a,i)=>`<button class="row" data-sheet="${i}"><span><span class="mono">Roll ${pad(a.n)}</span><br><b>${a.date}</b> · ${a.shots.length} bilder · ${a.style}</span><span aria-hidden="true">›</span></button>`).join(''):'<p class="mono">Inga framkallade rullar ännu.</p>'}`;
+ if(v=='sheet'){const a=S.arch[cur];return `${back('arch','Arkiv')}<span class="mono" style="display:block">Roll ${pad(a.n)} · ${a.date}</span><h2 style="font-size:30px;margin-bottom:12px">Kontaktark</h2><div class="sheet">${a.shots.map((s,i)=>`<button data-det="${i}" aria-label="Öppna bild ${i+1}"><img class="${CL[a.style]}" src="${s}" alt="Bild ${i+1} på rulle ${pad(a.n)}"></button>`).join('')}</div>`}
+ if(v=='det'){const a=S.arch[cur];return `${back('sheet','Kontaktark')}<span class="mono" style="display:block">Bild ${pic+1} / ${a.shots.length}</span><img class="hero ${CL[a.style]}" src="${a.shots[pic]}" alt="Bild ${pic+1}"><h2 style="font-size:26px;margin-top:14px">Roll ${pad(a.n)}, bild ${pic+1}</h2><p class="mono">${a.date} · ${a.style}</p>`}
+ return `<h2 style="font-size:30px">Mer</h2><p>Din kamera. På ditt sätt.</p>
+ <div class="row"><span>Filmstil<br><span class="mono">${r.style}</span></span></div>
+ <div class="row"><span>Lagring<br><span class="mono">Bilder sparas lokalt i webbläsaren</span></span></div>
+ <button data-reset>Rensa all data</button>`;
+}
+function draw(){A.innerHTML=view()+nav();const f=A.querySelector('[autofocus]');if(f)f.focus()}
+A.addEventListener('click',e=>{const t=e.target.closest('button');if(!t||t.disabled)return;const d=t.dataset;
+ if(d.go){v=d.go}else if('shot' in d){document.getElementById('cam').click();return}
+ else if(d.st){S.roll.style=d.st;save()}
+ else if(d.sheet){cur=+d.sheet;v='sheet'}
+ else if(d.det){pic=+d.det;v='det'}
+ else if('dev' in d){v='dev';const ms=matchMedia('(prefers-reduced-motion:reduce)').matches?300:2800;
+  setTimeout(()=>{const r=S.roll;S.arch.unshift({n:r.n,style:r.style,shots:r.shots,date:new Date().toLocaleDateString('sv-SE',{month:'short',year:'numeric'})});S.roll={n:r.n+1,style:r.style,shots:[]};save();cur=0;v='sheet';draw()},ms)}
+ else if('reset' in d){if(confirm('Rensa alla rullar?')){localStorage.removeItem('f36');S={roll:{n:1,style:'Warm 400',shots:[]},arch:[]};v='home'}}
+ draw();window.scrollTo(0,0)});
+document.getElementById('cam').addEventListener('change',e=>{const f=e.target.files[0];e.target.value='';if(!f||!left())return;
+ const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,900/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);S.roll.shots.push(c.toDataURL('image/jpeg',.7));save();draw()};im.src=u});
+draw();
+</script></body></html>
